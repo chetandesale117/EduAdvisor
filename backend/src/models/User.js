@@ -9,7 +9,15 @@ const userSchema = new mongoose.Schema(
     age: Number,
     gender: String,
     interests: [String], // e.g., ["science", "math"]
+    enrollments: [
+  {
+    college: { type: mongoose.Schema.Types.ObjectId, ref: "College" },
+    course: { type: String, required: true },
+    date: { type: Date, default: Date.now }
+  }
+],
   },
+  
   { timestamps: true }
 );
 
