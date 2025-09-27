@@ -1,5 +1,6 @@
 import College from "../models/College.js";
 import Course from "../models/Course.js";
+import User from "../models/User.js";
 
 // @desc Get all colleges
 export const getColleges = async (req, res) => {
@@ -64,5 +65,37 @@ export const addCourseToCollege = async (req, res) => {
     res.status(201).json(savedCourse);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+// ✅ Student enroll in a course
+export const enrollCourse = async (req, res) => {
+  try {
+    const { collegeId, course } = req.body;
+
+    const college = await College.findById(collegeId);
+    if (!college) {
+      return res.status(404).json({ message: "College not found" });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // prevent duplicate enrollment
+    const alreadyEnrolled = user.enrollments.some(
+      (e) => e.college.toString() === collegeId && e.course === course
+    );
+    if (alreadyEnrolled) {
+      return res.status(400).json({ message: "Already enrolled in this course" });
+    }
+
+    user.enrollments.push({ college: collegeId, course });
+    await user.save();
+
+    res.status(201).json({ message: "Enrolled successfully", enrollments: user.enrollments });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

@@ -17,4 +17,7 @@ router.get("/:id", getCollegeById);
 router.post("/", protect,adminOnly, addCollege);
 router.post("/:collegeId/course", protect,adminOnly, addCourseToCollege);
 
+//enrollement
+router.post("/enroll", protect, enrollCourse);
+
 export default router;
